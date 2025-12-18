@@ -2,33 +2,47 @@ def read_input(filename: str):
     input = []
     with open(filename, 'r') as file:
         for row in file.readlines():
-            input.append(row.split())
+            input.append(row.replace('\n', ''))
     return input
 
-def solve(worksheet: list[list[int]], column: int):
-    operation = worksheet[-1][col]
+def get_problems(worksheet: list[str]):
+    problems = []
+    problem = []
+    for col in range(0, len(worksheet[0])):
+        number_str = ""
+        for row in range(0, len(worksheet)):
+            if worksheet[row][col] != ' ':
+                number_str += worksheet[row][col]
+        if number_str:
+            problem.append(int(number_str))
+        else:
+            problems.append(problem)
+            problem = []
+    if problem:
+        problems.append(problem)
+    return problems
 
-    solution = 0
-    for row in range(0, len(worksheet) - 1):
-        if row == 0:
-            solution = int(worksheet[row][col])
-            continue
-
-        match operation:
+def solve_problem(problem: list[int], operator: str):
+    solution = problem[0]
+    for num in problem[1:]:
+        match operator:
             case '*':
-                solution *= int(worksheet[row][col])
+                solution *= num
             case '+':
-                solution += int(worksheet[row][col])
+                solution += num
     return solution
+
 
 if __name__ == '__main__':
     worksheet = read_input('advent6_input')
+
+    operators = worksheet[-1].split()
+    problems = get_problems(worksheet[:-1])
+    
     grand_total = 0
-    for col in range(0, len(worksheet[0])):
-        solution = solve(worksheet, col)
-        print(f"Column {col} solution is: {solution}")
-        grand_total += solution
-    print(f"Grand total: {grand_total}")
+    for problem, operator in zip(problems, operators):
+        grand_total += solve_problem(problem, operator)
+    print(f"Grand total is {grand_total}")
             
             
 
